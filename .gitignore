@@ -1,0 +1,25 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+
+# Build output
+artifacts/
+
+# Node / Angular
+web/node_modules/
+web/dist/
+web/.angular/
+
+# Editors and OS
+.vscode/*
+!web/.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local secrets
+*.env
+.env*
