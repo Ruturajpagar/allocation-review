@@ -3,12 +3,15 @@
 @let s = state();
 @if (s.status === 'loading') {
   <header class="page-header"><h1>Run {{ runId() }}</h1></header>
-  <div class="card loading" role="status" aria-live="polite">Loading the run review…</div>
+  <div class="card loading" role="status" aria-live="polite">
+    <span class="spinner" aria-hidden="true"></span>
+    Loading the run review…
+  </div>
 } @else if (s.status === 'error') {
   <header class="page-header"><h1>Run {{ runId() }}</h1></header>
   @if (s.error.status === 404) {
     <app-error-panel heading="Run not found" [error]="s.error" [showRetry]="false">
-      <a routerLink="/runs">Back to the run history</a>
+      <a class="button-link" routerLink="/runs">Back to the run history</a>
     </app-error-panel>
   } @else {
     <app-error-panel heading="Could not load this run" [error]="s.error" (retry)="retry()" />
@@ -17,51 +20,74 @@
   @let review = s.data;
   <header class="page-header">
     <div>
-      <h1>Run {{ review.runId }}</h1>
+      <span class="eyebrow">Run review</span>
+      <h1>Run <span class="run-code">{{ review.runId }}</span></h1>
       <p class="muted">Run date {{ review.runDate | date: 'd MMMM yyyy' }}</p>
     </div>
+    @if (exceptionCount(review) > 0) {
+      <span class="header-flag warn">{{ exceptionCount(review) }} of {{ review.gapCount }} gaps need attention</span>
+    } @else if (review.gapCount > 0) {
+      <span class="header-flag ok">All gaps filled</span>
+    }
   </header>
 
   <section class="summary" aria-label="Run summary">
-    <div class="stat card">
+    <div class="stat card stat-hero">
       <span class="stat-label">Total allocated units</span>
       <span class="stat-value" data-testid="total-units">{{ review.totalAllocatedUnits | number }}</span>
+      <span class="stat-sub">across {{ review.gapCount }} {{ review.gapCount === 1 ? 'gap' : 'gaps' }}</span>
     </div>
     <div class="stat card">
       <span class="stat-label">Gaps</span>
       <span class="stat-value">{{ review.gapCount }}</span>
+      @if (review.gapCount > 0) {
+        <span class="status-bar" aria-hidden="true">
+          <span class="seg filled" [style.width.%]="statusShare(review, review.statusCounts.filled)"></span>
+          <span class="seg partiallyFilled" [style.width.%]="statusShare(review, review.statusCounts.partiallyFilled)"></span>
+          <span class="seg unfilled" [style.width.%]="statusShare(review, review.statusCounts.unfilled)"></span>
+        </span>
+      }
     </div>
     <div class="stat card status-filled">
-      <span class="stat-label">Filled</span>
+      <span class="stat-label"><span class="dot"></span>Filled</span>
       <span class="stat-value" data-testid="count-filled">{{ review.statusCounts.filled }}</span>
     </div>
     <div class="stat card status-partiallyFilled">
-      <span class="stat-label">Partially filled</span>
+      <span class="stat-label"><span class="dot"></span>Partially filled</span>
       <span class="stat-value" data-testid="count-partially-filled">{{ review.statusCounts.partiallyFilled }}</span>
     </div>
     <div class="stat card status-unfilled">
-      <span class="stat-label">Unfilled</span>
+      <span class="stat-label"><span class="dot"></span>Unfilled</span>
       <span class="stat-value" data-testid="count-unfilled">{{ review.statusCounts.unfilled }}</span>
     </div>
   </section>
 
-  <div class="filter-bar" role="radiogroup" aria-label="Which gaps to show">
-    <button type="button" role="radio" [attr.aria-checked]="activeFilter() === 'all'"
-      [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
-      All gaps ({{ review.gapCount }})
-    </button>
-    <button type="button" role="radio" [attr.aria-checked]="activeFilter() === 'exceptions'"
-      [class.active]="activeFilter() === 'exceptions'" (click)="setFilter('exceptions')">
-      Exceptions only ({{ exceptionCount(review) }})
-    </button>
+  <div class="toolbar">
+    <h2>Gaps</h2>
+    <div class="filter-bar" role="radiogroup" aria-label="Which gaps to show">
+      <button type="button" role="radio" [attr.aria-checked]="activeFilter() === 'all'"
+        [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
+        All gaps ({{ review.gapCount }})
+      </button>
+      <button type="button" role="radio" [attr.aria-checked]="activeFilter() === 'exceptions'"
+        [class.active]="activeFilter() === 'exceptions'" (click)="setFilter('exceptions')">
+        Exceptions only ({{ exceptionCount(review) }})
+      </button>
+    </div>
   </div>
 
   @if (review.gaps.length === 0) {
     <div class="card empty">
       @if (activeFilter() === 'exceptions') {
+        <span class="state-icon ok" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+        </span>
         <h2>No exceptions</h2>
         <p class="muted">Every gap in this run is filled.</p>
       } @else {
+        <span class="state-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M5 7v12h14V7M9 11h6" /></svg>
+        </span>
         <h2>No gaps</h2>
         <p class="muted">This run did not record any replenishment gaps.</p>
       }
@@ -81,24 +107,32 @@
             <th scope="col" class="num">Original shortfall</th>
             <th scope="col" class="num">Allocated</th>
             <th scope="col" class="num">Remaining</th>
+            <th scope="col">Coverage</th>
             <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody>
           @for (gap of review.gaps; track gap.gapId) {
-            <tr data-testid="gap-row">
+            <tr data-testid="gap-row" [class]="'row-' + gap.status">
               <td class="gap-id">{{ gap.gapId }}</td>
-              <td>{{ gap.store }}</td>
+              <td class="store">{{ gap.store }}</td>
               <td>{{ gap.brand }}</td>
-              <td>{{ gap.productType }}</td>
+              <td class="muted">{{ gap.productType }}</td>
               <td class="num">{{ gap.originalShortfall | number }}</td>
-              <td class="num">{{ gap.unitsAllocated | number }}</td>
-              <td class="num">{{ gap.unitsRemaining | number }}</td>
+              <td class="num strong">{{ gap.unitsAllocated | number }}</td>
+              <td class="num" [class.remaining]="gap.unitsRemaining > 0">{{ gap.unitsRemaining | number }}</td>
+              <td>
+                <span class="coverage" [attr.aria-label]="fillPercent(gap) + '% covered'">
+                  <span class="coverage-track"><span [class]="'coverage-fill ' + gap.status" [style.width.%]="fillPercent(gap)"></span></span>
+                  <span class="coverage-pct">{{ fillPercent(gap) }}%</span>
+                </span>
+              </td>
               <td><span class="badge" [class]="'badge badge-' + gap.status">{{ statusLabels[gap.status] }}</span></td>
             </tr>
           }
         </tbody>
       </table>
     </div>
+    <p class="table-note muted small">Shortfalls are rounded up to whole units before allocation is subtracted. Remaining never goes below zero.</p>
   }
 }

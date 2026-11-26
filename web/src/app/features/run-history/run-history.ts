@@ -15,6 +15,7 @@ export const HISTORY_PAGE_SIZE = 10;
   selector: 'app-run-history',
   imports: [RouterLink, DatePipe, DecimalPipe, ErrorPanel],
   templateUrl: './run-history.html',
+  styleUrl: './run-history.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RunHistory {
@@ -44,5 +45,11 @@ export class RunHistory {
 
   protected retry(): void {
     this.reload.update((n) => n + 1);
+  }
+
+  /** Width of a run's units bar, relative to the busiest run on this page (display only). */
+  protected unitsPercent(run: RunSummary, runs: RunSummary[]): number {
+    const max = Math.max(...runs.map((r) => r.totalAllocatedUnits), 0);
+    return max === 0 ? 0 : Math.round((run.totalAllocatedUnits / max) * 100);
   }
 }

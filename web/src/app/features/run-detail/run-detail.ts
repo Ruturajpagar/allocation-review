@@ -4,7 +4,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { combineLatest, switchMap } from 'rxjs';
 import { LoadState, toLoadState } from '../../core/load-state';
-import { GAP_STATUS_LABELS, GapFilter, RunReview } from '../../core/models';
+import { GAP_STATUS_LABELS, GapFilter, GapReviewRow, RunReview } from '../../core/models';
 import { RunsApi } from '../../core/runs/runs.api';
 import { ErrorPanel } from '../../shared/error-panel';
 
@@ -51,5 +51,16 @@ export class RunDetail {
 
   protected exceptionCount(review: RunReview): number {
     return review.statusCounts.partiallyFilled + review.statusCounts.unfilled;
+  }
+
+  /** Share of the run's gaps with a given status, for the summary bar (display only). */
+  protected statusShare(review: RunReview, count: number): number {
+    return review.gapCount === 0 ? 0 : (count / review.gapCount) * 100;
+  }
+
+  /** How much of a gap's rounded shortfall is covered, 0–100 (display only; the status comes from the API). */
+  protected fillPercent(gap: GapReviewRow): number {
+    const needed = gap.unitsAllocated + gap.unitsRemaining;
+    return needed === 0 ? 100 : Math.min(100, Math.round((gap.unitsAllocated / needed) * 100));
   }
 }

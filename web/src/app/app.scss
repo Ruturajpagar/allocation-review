@@ -1,35 +1,70 @@
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: saturate(1.6) blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-inner {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 12px 24px;
-  background: var(--header-bg);
-  color: #fff;
-
-  a {
-    color: #fff;
-  }
+  gap: 28px;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  min-height: 60px;
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.02rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
   text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  box-shadow: 0 4px 12px -4px rgb(79 70 229 / 60%);
+
+  svg {
+    width: 17px;
+    height: 17px;
+  }
 }
 
 .topnav {
   display: flex;
-  gap: 16px;
+  gap: 4px;
   flex: 1;
 
   a {
-    opacity: 0.8;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--muted);
     text-decoration: none;
 
+    &:hover {
+      color: var(--text);
+      background: var(--surface-2);
+    }
+
     &.active {
-      opacity: 1;
-      text-decoration: underline;
-      text-underline-offset: 6px;
+      color: var(--accent);
+      background: var(--accent-soft);
     }
   }
 }
@@ -39,40 +74,63 @@
   align-items: center;
   gap: 10px;
   margin-left: auto;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.user-email {
+  color: var(--text);
+  font-weight: 500;
 }
 
 .role-pill {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 18%);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
+  color: var(--muted);
 }
 
 .link-button {
-  background: none;
-  border: 1px solid rgb(255 255 255 / 40%);
-  color: #fff;
-  padding: 4px 10px;
+  padding: 6px 12px;
+  font-size: 0.86rem;
 }
 
 .page {
-  max-width: 1100px;
+  max-width: 1140px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px 24px 64px;
 }
 
 @media (max-width: 640px) {
-  .topbar {
-    flex-wrap: wrap;
-    gap: 8px 16px;
+  .topbar-inner {
+    gap: 12px;
+    padding: 10px 16px;
   }
 
-  .user-email {
+  .brand {
+    font-size: 0;
+    gap: 0;
+  }
+
+  .user-meta {
     display: none;
   }
 
   .page {
-    padding: 16px;
+    padding: 20px 16px 48px;
   }
 }

@@ -1,5 +1,6 @@
 <header class="page-header">
   <div>
+    <span class="eyebrow">Allocation runs</span>
     <h1>Allocation run history</h1>
     <p class="muted">Saved runs, newest first. Open a run to review its replenishment gaps.</p>
   </div>
@@ -7,16 +8,25 @@
 
 @let s = state();
 @if (s.status === 'loading') {
-  <div class="card loading" role="status" aria-live="polite">Loading saved runs…</div>
+  <div class="card loading" role="status" aria-live="polite">
+    <span class="spinner" aria-hidden="true"></span>
+    Loading saved runs…
+  </div>
 } @else if (s.status === 'error') {
   <app-error-panel heading="Could not load the run history" [error]="s.error" (retry)="retry()" />
 } @else if (s.data.totalCount === 0) {
   <div class="card empty">
+    <span class="state-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M5 7v12h14V7M9 11h6" /></svg>
+    </span>
     <h2>No saved runs yet</h2>
     <p class="muted">When an allocation run is saved it will appear here.</p>
   </div>
 } @else if (s.data.items.length === 0) {
   <div class="card empty">
+    <span class="state-icon warn" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16.5v.5M4 20h16L12 4z" /></svg>
+    </span>
     <h2>This page is empty</h2>
     <p class="muted">There {{ s.data.totalPages === 1 ? 'is only 1 page' : 'are only ' + s.data.totalPages + ' pages' }} of runs.</p>
     <button type="button" (click)="goToPage(1)">Go to the first page</button>
@@ -37,9 +47,17 @@
         @for (run of s.data.items; track run.runId) {
           <tr>
             <td><a [routerLink]="['/runs', run.runId]" class="run-id">{{ run.runId }}</a></td>
-            <td>{{ run.runDate | date: 'd MMM yyyy' }}</td>
-            <td class="num">{{ run.totalAllocatedUnits | number }}</td>
-            <td class="num"><a [routerLink]="['/runs', run.runId]" [attr.aria-label]="'Review ' + run.runId">Review →</a></td>
+            <td>
+              <span class="date">{{ run.runDate | date: 'd MMM yyyy' }}</span>
+              <span class="weekday">{{ run.runDate | date: 'EEEE' }}</span>
+            </td>
+            <td class="num">
+              <span class="units">
+                <span class="units-bar" aria-hidden="true"><span [style.width.%]="unitsPercent(run, s.data.items)"></span></span>
+                <span class="units-value">{{ run.totalAllocatedUnits | number }}</span>
+              </span>
+            </td>
+            <td class="num"><a class="row-action" [routerLink]="['/runs', run.runId]" [attr.aria-label]="'Review ' + run.runId">Review →</a></td>
           </tr>
         }
       </tbody>
@@ -48,7 +66,7 @@
 
   <nav class="pager" aria-label="Run history pages">
     <button type="button" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() <= 1">← Newer</button>
-    <span>Page {{ currentPage() }} of {{ s.data.totalPages }} · {{ s.data.totalCount }} {{ s.data.totalCount === 1 ? 'run' : 'runs' }}</span>
+    <span>Page <strong>{{ currentPage() }}</strong> of {{ s.data.totalPages }} · {{ s.data.totalCount }} {{ s.data.totalCount === 1 ? 'run' : 'runs' }}</span>
     <button type="button" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() >= s.data.totalPages">Older →</button>
   </nav>
 }

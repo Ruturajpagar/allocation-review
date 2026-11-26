@@ -1,0 +1,43 @@
+.date {
+  display: block;
+  font-weight: 500;
+}
+
+.weekday {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.units {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.units-bar {
+  width: 110px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #818cf8, var(--accent));
+  }
+}
+
+.units-value {
+  min-width: 3ch;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .units-bar {
+    display: none;
+  }
+}

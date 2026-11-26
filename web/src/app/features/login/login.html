@@ -1,37 +1,59 @@
-<section class="login card">
-  <h1>Sign in</h1>
-  <p class="muted">Allocation run review for the merchandising team.</p>
+<div class="login-shell">
+  <aside class="login-aside" aria-hidden="true">
+    <span class="eyebrow">Merchandising</span>
+    <h2>Review every allocation run in one place.</h2>
+    <ul class="feature-list">
+      <li><span class="dot ok"></span>See which store gaps were filled</li>
+      <li><span class="dot warn"></span>Spot partially filled gaps</li>
+      <li><span class="dot danger"></span>Find unfilled shortfalls before dispatch</li>
+    </ul>
+    <div class="aside-preview">
+      <div class="preview-row"><span>G-01 · Store A</span><span class="badge badge-partiallyFilled">Partially filled</span></div>
+      <div class="preview-row"><span>G-02 · Store B</span><span class="badge badge-filled">Filled</span></div>
+      <div class="preview-row"><span>G-03 · Store C</span><span class="badge badge-unfilled">Unfilled</span></div>
+    </div>
+  </aside>
 
-  @if (sessionExpired()) {
-    <p class="notice" role="status">Your session expired. Please sign in again to continue.</p>
-  }
+  <section class="login card">
+    <h1>Sign in</h1>
+    <p class="muted">Allocation run review for the merchandising team.</p>
 
-  @if (error(); as message) {
-    <p class="alert" role="alert">{{ message }}</p>
-  }
-
-  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <label for="email">Email</label>
-    <input id="email" type="email" formControlName="email" autocomplete="username" autofocus
-      [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid" />
-    @if (form.controls.email.touched && form.controls.email.invalid) {
-      <small class="field-error">Enter a valid email address.</small>
+    @if (sessionExpired()) {
+      <p class="notice" role="status">Your session expired. Please sign in again to continue.</p>
     }
 
-    <label for="password">Password</label>
-    <input id="password" type="password" formControlName="password" autocomplete="current-password"
-      [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid" />
-    @if (form.controls.password.touched && form.controls.password.invalid) {
-      <small class="field-error">Enter your password.</small>
+    @if (error(); as message) {
+      <p class="alert" role="alert">{{ message }}</p>
     }
 
-    <button type="submit" class="primary" [disabled]="submitting()">
-      {{ submitting() ? 'Signing in…' : 'Sign in' }}
-    </button>
-  </form>
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" autocomplete="username" autofocus
+        placeholder="you@company.com"
+        [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid" />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <small class="field-error">Enter a valid email address.</small>
+      }
 
-  <details class="demo-users">
-    <summary>Demo accounts</summary>
-    <p>See the README: an <strong>Admin</strong> can review runs; a <strong>Viewer</strong> can sign in but has no access to reviews.</p>
-  </details>
-</section>
+      <label for="password">Password</label>
+      <input id="password" type="password" formControlName="password" autocomplete="current-password"
+        placeholder="••••••••"
+        [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid" />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <small class="field-error">Enter your password.</small>
+      }
+
+      <button type="submit" class="primary submit" [disabled]="submitting()">
+        @if (submitting()) {
+          <span class="btn-spinner" aria-hidden="true"></span>
+        }
+        {{ submitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <details class="demo-users">
+      <summary>Demo accounts</summary>
+      <p>See the README: an <strong>Admin</strong> can review runs; a <strong>Viewer</strong> can sign in but has no access to reviews.</p>
+    </details>
+  </section>
+</div>

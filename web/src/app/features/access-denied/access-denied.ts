@@ -6,6 +6,11 @@ import { AuthService } from '../../core/auth/auth.service';
   selector: 'app-access-denied',
   template: `
     <section class="card narrow">
+      <span class="state-icon warn" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" />
+        </svg>
+      </span>
       <h1>No access to run reviews</h1>
       <p>
         You are signed in as <strong>{{ auth.currentUser()?.email }}</strong>

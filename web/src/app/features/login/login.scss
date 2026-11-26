@@ -1,6 +1,102 @@
+.login-shell {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  max-width: 920px;
+  margin: 24px auto;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  background: var(--surface);
+}
+
+.login-aside {
+  position: relative;
+  padding: 40px;
+  color: #e0e7ff;
+  background:
+    radial-gradient(500px 300px at 100% 0%, rgb(129 140 248 / 45%), transparent 60%),
+    linear-gradient(160deg, #312e81 0%, #1e1b4b 100%);
+
+  .eyebrow {
+    color: #a5b4fc;
+  }
+
+  h2 {
+    font-size: 1.55rem;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 22px;
+  }
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 30px;
+  display: grid;
+  gap: 10px;
+  font-size: 0.95rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  &.ok {
+    background: #4ade80;
+  }
+
+  &.warn {
+    background: #fbbf24;
+  }
+
+  &.danger {
+    background: #f87171;
+  }
+}
+
+.aside-preview {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 12%);
+  backdrop-filter: blur(4px);
+}
+
+.preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgb(255 255 255 / 7%);
+  font-size: 0.85rem;
+  font-family: var(--mono);
+  color: #fff;
+
+  .badge {
+    font-family: Inter, system-ui, sans-serif;
+  }
+}
+
 .login {
-  max-width: 400px;
-  margin: 48px auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 44px 40px;
+  align-self: center;
 
   h1 {
     margin-top: 0;
@@ -9,25 +105,65 @@
   form {
     display: grid;
     gap: 6px;
-    margin-top: 16px;
+    margin-top: 20px;
   }
 
   label {
+    font-size: 0.88rem;
     font-weight: 600;
     margin-top: 10px;
   }
+}
 
-  button {
-    margin-top: 18px;
+.submit {
+  margin-top: 20px;
+  padding: 11px 14px;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(255 255 255 / 40%);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.8s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
 .field-error {
   color: var(--danger);
+  font-size: 0.82rem;
 }
 
 .demo-users {
-  margin-top: 20px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+
+  summary {
+    cursor: pointer;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 760px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+    margin: 0;
+  }
+
+  .login-aside {
+    display: none;
+  }
+
+  .login {
+    padding: 28px 22px;
+  }
 }
