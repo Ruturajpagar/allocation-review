@@ -1,0 +1,22 @@
+# Local PostgreSQL for development. Start: docker compose up -d   Stop: docker compose down
+# Port 5433 on the host avoids clashing with a PostgreSQL already installed on 5432.
+services:
+  db:
+    image: postgres:17
+    container_name: allocation-review-db
+    environment:
+      POSTGRES_DB: allocation_review
+      POSTGRES_USER: allocation
+      POSTGRES_PASSWORD: allocation_dev # local development only
+    ports:
+      - "5433:5432"
+    volumes:
+      - allocation-review-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U allocation -d allocation_review"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  allocation-review-data:
