@@ -1,0 +1,14 @@
+{
+  "description": "Synthetic saved allocation rows from the assessment brief. One row per batch allocation; a gap with no batch has batchId null and units 0.",
+  "runs": [
+    { "runId": "R-102", "runDate": "2026-09-14" },
+    { "runId": "R-101", "runDate": "2026-09-13" }
+  ],
+  "rows": [
+    { "runId": "R-102", "gapId": "G-01", "store": "Store A", "brand": "Brand X", "productType": "Frames", "shortfall": 5, "batchId": "B-401", "units": 2 },
+    { "runId": "R-102", "gapId": "G-01", "store": "Store A", "brand": "Brand X", "productType": "Frames", "shortfall": 5, "batchId": "B-402", "units": 1 },
+    { "runId": "R-102", "gapId": "G-02", "store": "Store B", "brand": "Brand X", "productType": "Frames", "shortfall": 2, "batchId": "B-501", "units": 2 },
+    { "runId": "R-102", "gapId": "G-03", "store": "Store C", "brand": "Brand Y", "productType": "Sunglasses", "shortfall": 4, "batchId": null, "units": 0 },
+    { "runId": "R-101", "gapId": "G-01", "store": "Store D", "brand": "Brand Z", "productType": "Frames", "shortfall": 1, "batchId": "B-601", "units": 1 }
+  ]
+}
