@@ -1,0 +1,54 @@
+<header class="page-header">
+  <div>
+    <h1>Allocation run history</h1>
+    <p class="muted">Saved runs, newest first. Open a run to review its replenishment gaps.</p>
+  </div>
+</header>
+
+@let s = state();
+@if (s.status === 'loading') {
+  <div class="card loading" role="status" aria-live="polite">Loading saved runs…</div>
+} @else if (s.status === 'error') {
+  <app-error-panel heading="Could not load the run history" [error]="s.error" (retry)="retry()" />
+} @else if (s.data.totalCount === 0) {
+  <div class="card empty">
+    <h2>No saved runs yet</h2>
+    <p class="muted">When an allocation run is saved it will appear here.</p>
+  </div>
+} @else if (s.data.items.length === 0) {
+  <div class="card empty">
+    <h2>This page is empty</h2>
+    <p class="muted">There {{ s.data.totalPages === 1 ? 'is only 1 page' : 'are only ' + s.data.totalPages + ' pages' }} of runs.</p>
+    <button type="button" (click)="goToPage(1)">Go to the first page</button>
+  </div>
+} @else {
+  <div class="card table-card">
+    <table>
+      <caption class="visually-hidden">Saved allocation runs, newest first</caption>
+      <thead>
+        <tr>
+          <th scope="col">Run</th>
+          <th scope="col">Run date</th>
+          <th scope="col" class="num">Total allocated units</th>
+          <th scope="col"><span class="visually-hidden">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (run of s.data.items; track run.runId) {
+          <tr>
+            <td><a [routerLink]="['/runs', run.runId]" class="run-id">{{ run.runId }}</a></td>
+            <td>{{ run.runDate | date: 'd MMM yyyy' }}</td>
+            <td class="num">{{ run.totalAllocatedUnits | number }}</td>
+            <td class="num"><a [routerLink]="['/runs', run.runId]" [attr.aria-label]="'Review ' + run.runId">Review →</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="pager" aria-label="Run history pages">
+    <button type="button" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() <= 1">← Newer</button>
+    <span>Page {{ currentPage() }} of {{ s.data.totalPages }} · {{ s.data.totalCount }} {{ s.data.totalCount === 1 ? 'run' : 'runs' }}</span>
+    <button type="button" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() >= s.data.totalPages">Older →</button>
+  </nav>
+}

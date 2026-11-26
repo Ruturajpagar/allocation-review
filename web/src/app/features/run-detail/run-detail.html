@@ -1,0 +1,104 @@
+<nav class="breadcrumb" aria-label="Breadcrumb"><a routerLink="/runs">← Run history</a></nav>
+
+@let s = state();
+@if (s.status === 'loading') {
+  <header class="page-header"><h1>Run {{ runId() }}</h1></header>
+  <div class="card loading" role="status" aria-live="polite">Loading the run review…</div>
+} @else if (s.status === 'error') {
+  <header class="page-header"><h1>Run {{ runId() }}</h1></header>
+  @if (s.error.status === 404) {
+    <app-error-panel heading="Run not found" [error]="s.error" [showRetry]="false">
+      <a routerLink="/runs">Back to the run history</a>
+    </app-error-panel>
+  } @else {
+    <app-error-panel heading="Could not load this run" [error]="s.error" (retry)="retry()" />
+  }
+} @else {
+  @let review = s.data;
+  <header class="page-header">
+    <div>
+      <h1>Run {{ review.runId }}</h1>
+      <p class="muted">Run date {{ review.runDate | date: 'd MMMM yyyy' }}</p>
+    </div>
+  </header>
+
+  <section class="summary" aria-label="Run summary">
+    <div class="stat card">
+      <span class="stat-label">Total allocated units</span>
+      <span class="stat-value" data-testid="total-units">{{ review.totalAllocatedUnits | number }}</span>
+    </div>
+    <div class="stat card">
+      <span class="stat-label">Gaps</span>
+      <span class="stat-value">{{ review.gapCount }}</span>
+    </div>
+    <div class="stat card status-filled">
+      <span class="stat-label">Filled</span>
+      <span class="stat-value" data-testid="count-filled">{{ review.statusCounts.filled }}</span>
+    </div>
+    <div class="stat card status-partiallyFilled">
+      <span class="stat-label">Partially filled</span>
+      <span class="stat-value" data-testid="count-partially-filled">{{ review.statusCounts.partiallyFilled }}</span>
+    </div>
+    <div class="stat card status-unfilled">
+      <span class="stat-label">Unfilled</span>
+      <span class="stat-value" data-testid="count-unfilled">{{ review.statusCounts.unfilled }}</span>
+    </div>
+  </section>
+
+  <div class="filter-bar" role="radiogroup" aria-label="Which gaps to show">
+    <button type="button" role="radio" [attr.aria-checked]="activeFilter() === 'all'"
+      [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
+      All gaps ({{ review.gapCount }})
+    </button>
+    <button type="button" role="radio" [attr.aria-checked]="activeFilter() === 'exceptions'"
+      [class.active]="activeFilter() === 'exceptions'" (click)="setFilter('exceptions')">
+      Exceptions only ({{ exceptionCount(review) }})
+    </button>
+  </div>
+
+  @if (review.gaps.length === 0) {
+    <div class="card empty">
+      @if (activeFilter() === 'exceptions') {
+        <h2>No exceptions</h2>
+        <p class="muted">Every gap in this run is filled.</p>
+      } @else {
+        <h2>No gaps</h2>
+        <p class="muted">This run did not record any replenishment gaps.</p>
+      }
+    </div>
+  } @else {
+    <div class="card table-card">
+      <table>
+        <caption class="visually-hidden">
+          {{ activeFilter() === 'exceptions' ? 'Partially filled and unfilled gaps' : 'All gaps' }} in run {{ review.runId }}
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Gap</th>
+            <th scope="col">Store</th>
+            <th scope="col">Brand</th>
+            <th scope="col">Product type</th>
+            <th scope="col" class="num">Original shortfall</th>
+            <th scope="col" class="num">Allocated</th>
+            <th scope="col" class="num">Remaining</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (gap of review.gaps; track gap.gapId) {
+            <tr data-testid="gap-row">
+              <td class="gap-id">{{ gap.gapId }}</td>
+              <td>{{ gap.store }}</td>
+              <td>{{ gap.brand }}</td>
+              <td>{{ gap.productType }}</td>
+              <td class="num">{{ gap.originalShortfall | number }}</td>
+              <td class="num">{{ gap.unitsAllocated | number }}</td>
+              <td class="num">{{ gap.unitsRemaining | number }}</td>
+              <td><span class="badge" [class]="'badge badge-' + gap.status">{{ statusLabels[gap.status] }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}
